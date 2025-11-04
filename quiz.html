@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Ignis Rapid-Fire Science Quiz 🔥</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0d0d0d;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            margin: auto;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 40px #ff5722;
+        }
+
+        h1 {
+            color: #ff5722;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ff5722, 0 0 20px #ff9800;
+        }
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        button {
+            padding: 12px 28px;
+            margin: 8px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #222;
+            color: #fff;
+            transition: 0.3s;
+            box-shadow: 0 0 5px #ff5722;
+        }
+
+            button:hover {
+                background: #ff5722;
+                transform: scale(1.1);
+            }
+
+        #score {
+            font-size: 26px;
+            margin-top: 25px;
+            color: #00ff99;
+            text-shadow: 0 0 10px #00ff99;
+        }
+
+        #timer {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffcc00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>🔥 Ignis Rapid-Fire Quiz 🔥</h1>
+
+        <!-- Audio files -->
+        <audio id="bgMusic" src="bg_music.mp3" autoplay loop></audio>
+        <audio id="correct" src="correct.mp3"></audio>
+        <audio id="wrong" src="wrong.mp3"></audio>
+        <audio id="tick" src="tick.mp3"></audio>
+
+        <div id="timer"></div>
+        <div id="question-container">
+            <div id="question" class="question"></div>
+            <div id="options"></div>
+        </div>
+        <div id="score"></div>
+    </div>
+
+    <script>
+        // ===== Quiz Questions =====
+        const quiz = [
+            // Human Body
+            { q: "The brain controls:", o: ["A) Breathing", "B) Digestion", "C) All body activities", "D) Sleeping"], a: "C" },
+            { q: "The organ that pumps blood:", o: ["A) Lungs", "B) Heart", "C) Kidney", "D) Stomach"], a: "B" },
+            { q: "Which system carries oxygen?", o: ["A) Circulatory", "B) Digestive", "C) Nervous", "D) Skeletal"], a: "A" },
+            { q: "Red blood cells carry:", o: ["A) Food", "B) Oxygen", "C) Waste", "D) Hormones"], a: "B" },
+            { q: "The largest organ in our body is the:", o: ["A) Skin", "B) Heart", "C) Liver", "D) Lungs"], a: "A" },
+            { q: "The bone that protects the brain:", o: ["A) Rib cage", "B) Skull", "C) Spine", "D) Hip bone"], a: "B" },
+            { q: "What joins bones together?", o: ["A) Ligaments", "B) Muscles", "C) Tendons", "D) Nerves"], a: "A" },
+            { q: "Which part of the digestive system absorbs nutrients?", o: ["A) Mouth", "B) Stomach", "C) Small intestine", "D) Large intestine"], a: "C" },
+            { q: "What organ helps remove waste from blood?", o: ["A) Heart", "B) Kidneys", "C) Lungs", "D) Brain"], a: "B" },
+            { q: "The sense organ for balance is found in the:", o: ["A) Nose", "B) Inner ear", "C) Eyes", "D) Skin"], a: "B" },
+            // Forces & Energy
+            { q: "What type of force pulls objects toward Earth?", o: ["A) Magnetism", "B) Gravity", "C) Friction", "D) Push"], a: "B" },
+            { q: "Friction always:", o: ["A) Speeds things up", "B) Slows things down", "C) Makes them lighter", "D) Increases mass"], a: "B" },
+            { q: "Stored energy is called:", o: ["A) Kinetic", "B) Potential", "C) Sound", "D) Light"], a: "B" },
+            { q: "A stretched rubber band has:", o: ["A) Potential energy", "B) Kinetic energy", "C) Light energy", "D) Chemical energy"], a: "A" },
+            { q: "The energy we get from food is:", o: ["A) Kinetic", "B) Heat", "C) Chemical", "D) Potential"], a: "C" },
+            { q: "What type of energy powers a moving fan?", o: ["A) Electrical", "B) Chemical", "C) Light", "D) Solar"], a: "A" },
+            { q: "Which force helps you write with a pencil?", o: ["A) Gravity", "B) Friction", "C) Magnetism", "D) Push"], a: "B" },
+            { q: "Which of these is NOT a force?", o: ["A) Gravity", "B) Friction", "C) Heat", "D) Magnetism"], a: "C" },
+            { q: "Solar panels change sunlight into:", o: ["A) Heat energy", "B) Electrical energy", "C) Sound energy", "D) Chemical energy"], a: "B" },
+            { q: "A moving bus has:", o: ["A) Kinetic energy", "B) Heat energy", "C) Light energy", "D) Sound energy"], a: "A" },
+            // Solar System
+            { q: "The planet closest to the Sun:", o: ["A) Mercury", "B) Venus", "C) Earth", "D) Mars"], a: "A" },
+            { q: "The biggest planet:", o: ["A) Earth", "B) Jupiter", "C) Saturn", "D) Neptune"], a: "B" },
+            { q: "The planet with rings:", o: ["A) Mars", "B) Saturn", "C) Neptune", "D) Venus"], a: "B" },
+            { q: "The Red Planet is:", o: ["A) Earth", "B) Mars", "C) Venus", "D) Mercury"], a: "B" },
+            { q: "The Sun is a:", o: ["A) Planet", "B) Star", "C) Moon", "D) Asteroid"], a: "B" },
+            { q: "The Moon shines because it:", o: ["A) Has its own light", "B) Reflects sunlight", "C) Is hot", "D) Glows naturally"], a: "B" },
+            { q: "The Earth takes one year to:", o: ["A) Rotate", "B) Revolve around the Sun", "C) Spin on its axis", "D) Orbit the Moon"], a: "B" },
+            { q: "Which planet is called 'Earth’s twin'?", o: ["A) Mars", "B) Venus", "C) Neptune", "D) Mercury"], a: "B" },
+            { q: "Which planet is farthest from the Sun?", o: ["A) Uranus", "B) Neptune", "C) Saturn", "D) Jupiter"], a: "B" },
+            { q: "Which force keeps planets in orbit?", o: ["A) Magnetism", "B) Gravity", "C) Friction", "D) Electricity"], a: "B" },
+            // Physical & Chemical Changes, Light, Sound ...
+            // Add remaining questions here up to 60+ as before
+        ];
+
+        let current = 0;
+        let score = 0;
+        let timer;
+        const timePerQuestion = 10;
+
+        // ===== Functions =====
+        function startTimer() {
+            let timeLeft = timePerQuestion;
+            document.getElementById("timer").innerText = `⏱️ Time left: ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").innerText = `⏱️ Time left: ${timeLeft}s`;
+                document.getElementById("tick").play();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("⏰ Time's up!");
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            if (current >= quiz.length) {
+                document.getElementById("question-container").style.display = "none";
+                document.getElementById("score").innerText = `🏆 Quiz Complete! Your score: ${score}/${quiz.length}`;
+                return;
+            }
+            clearInterval(timer);
+            startTimer();
+            const q = quiz[current];
+            document.getElementById("question").innerText = q.q;
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = "";
+            q.o.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt[0]);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(ans) {
+            clearInterval(timer);
+            if (ans === quiz[current].a) {
+                score++;
+                document.getElementById("correct").play();
+            } else {
+                document.getElementById("wrong").play();
+            }
+            current++;
+            showQuestion();
+        }
+
+        function nextQuestion() {
+            current++;
+            showQuestion();
+        }
+
+        // ===== Start Quiz =====
+        showQuestion();
+    </script>
+
+</body>
+</html>
